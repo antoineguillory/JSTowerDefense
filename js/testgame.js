@@ -1,77 +1,53 @@
-/**
- * Created by antoineguillory on 20/02/2018.
- */
-
-function play(){
-    var road = [];
-    road[0]= new Pos(100,100);
-    road[1]= new Pos(150,100);
-    road[2]= new Pos(150,150);
-
-    var road2 = [];
-    road2[0]= new Pos(50,100);
-    road2[1]= new Pos(150,100);
-    road2[2]= new Pos(150,150);
-
-    var towers = new Set();
-    towers.add(new Tower("testcanvas", new Pos(100,150), 60, 1, 1, 1, 1, 30, 30));
-    towers.add(new Tower("testcanvas", new Pos(200,150), 10, 1, 1, 1, 1, 30, 30));
-
-    var enemies = new Set();
-    enemies.add(new Enemy("testcanvas",30,1,1,road,10,10));
-    enemies.add(new Enemy("testcanvas",30,1,1,road2,20,20));
-
-    drawAll(towers, enemies);
-
-    var intervalId = setInterval(function() {
-        playOneTurn(intervalId, towers, enemies);
-    }, 100);
-}
-
-function playOneTurn(intervalId, towers, enemies) {
-    context.drawImage(image,0,0,500,500);
-    if (moveAll(enemies)) {
-        clearInterval(intervalId);
-    }
-    drawAll(towers, enemies);
-    shootAll(towers, enemies);
-}
-
-function moveAll(enemies) {
-    if (enemies.size == 0) {
-        return true;
-    }
-    var enemiesInEnd = 0;
-    enemies.forEach(function(e) {
-        if (e.move()) {
-            enemiesInEnd += 1;
-        }
-    });
-    return (enemiesInEnd == enemies.length);
-}
-
-function drawAll(towers, enemies){
-    towers.forEach(function(t) {
-        t.draw();
-    });
-    enemies.forEach(function(e) {
-        e.draw();
-    });
-}
-
-function shootAll(towers, enemies){
-    towers.forEach(function(t) {
-        var e = t.nearestEnemy(enemies)
-        if (e != null && t.shoot(e)) {
-            enemies.delete(e);
-        }
-    });
-}
+TYPE = 2;
 
 $(document).ready(function() {
-    context = document.getElementById("testcanvas").getContext("2d");
+    var canvas = "canvas";
+    var hCanvas = 500;
+    var wCanvas = 500;
+    var initNbEnemiesWaves = 10;
+    var initLife = 30;
+    var initWallet = 500;
+    var upCoeffHP = 1;
+    context = document.getElementById(canvas).getContext("2d");
     var img = document.getElementById("mapimg");
     image = new Image();
     image.src = img.getAttribute("src");
-    play();
+
+    var game = new Game(canvas, hCanvas, wCanvas,
+        initNbEnemiesWaves, initLife, initWallet, upCoeffHP);
+
+    $('#wallet').html(game.getWallet());
+    $('#wave').html(game.getWave());
+    $('#life').html(game.getLife());
+
+    $("#" + canvas).click(function(event) {
+        var rect = document.getElementById(canvas).getBoundingClientRect();
+        var x = event.clientX - rect.left;
+        var y = event.clientY - rect.top;
+        if(TYPE==1){
+            game.addDefaultTower(new Pos(x,y));
+        } else {
+            game.addSniperTower(new Pos(x,y));
+        }
+        $('#wallet').html(game.getWallet());
+    });
+
+    $("#nextwave").click(function(event) {
+        game.nextWave();
+        $("#wave").html(game.getWave());
+    });
+
+    $('#switchtype').click(function(event) {
+        if(TYPE == 1){
+            TYPE = 2;
+            $("#type").html("Sniper (250 €)");
+        }
+        else {
+            TYPE = 1;
+            $("#type").html("Default (175€)");
+        }
+    });
+
+    $('#switchtype').click();
+    game.play();
 });

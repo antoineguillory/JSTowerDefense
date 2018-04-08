@@ -10,8 +10,9 @@
         <script src="../js/Entity.js"></script>
         <script src="../js/Enemy.js"></script>
         <script src="../js/Tower.js"></script>
-        <script src="../js/testgame.js"></script>
         <script src="../js/Utilities.js"></script>
+        <script src="../js/Game.js"></script>
+        <script src="../js/testgame.js"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <body>
@@ -24,7 +25,7 @@
                 //Valeurs du modèle
                 $txt = str_replace("png","txt",$_POST["choixmap"]);
                 $handle = fopen("../txt/".$txt,"r");
-                echo "<p id='modelmap'>";
+                echo "<p id='modelmap' style='display:none'>";
                 if ($handle) {
                     while (($buffer = fgets($handle, 4096)) !== false) {
                         echo($buffer);
@@ -39,8 +40,17 @@
                 echo "<p>Aucune map choisie...</p>";
             }
         ?>
-        <canvas id="testcanvas" width="500" height="500" style="z-index: 1">
-
-        </canvas>
+        <p class="info">Argent : <span id="wallet"></span>€</p>
+        <p class="info">Vies restantes :<span id="life"></span></p>
+        <p class="info">Vague n°<span id="wave"></span></p>
+        <div id="nextwavediv" class="btn">
+            <button id="nextwave">NextWave</button>
+        </div>
+        <div id="switchtow" class="btn">
+            <button id="switchtype">SwitchTowerType</button>
+        </div>
+        <p id="type"></p>
+        <p id="pasdargent"></p>
+        <canvas id="canvas" width="500" height="500" style="z-index: 1"></canvas>
     </body>
 </html>
